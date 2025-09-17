@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App 🌤</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #6dd5fa, #ffffff);
+        }
+
+        .weather-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            width: 350px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .weather-container:hover {
+            transform: scale(1.03);
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        input {
+            width: 80%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            margin-top: 15px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: none;
+            background-color: #4682B4;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #315f8c;
+        }
+
+        .result {
+            margin-top: 25px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .weather-icon {
+            width: 80px;
+            height: 80px;
+        }
+
+        @media (max-width: 400px) {
+            .weather-container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="weather-container">
+    <h1>🌤 Check Weather</h1>
+    <input type="text" id="cityInput" placeholder="Enter city name">
+    <br>
+    <button onclick="getWeather()">Get Weather</button>
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    const API_KEY = "bd20b08f37bfb671d0ea00efd8bea5f7";
+
+    async function getWeather() {
+        const city = document.getElementById('cityInput').value.trim();
+        const resultDiv = document.getElementById('result');
+
+        if(city === "") {
+            resultDiv.innerHTML = "<p style='color:red;'>Please enter a city name!</p>";
+            return;
+        }
+
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+
+        try {
+            const response = await fetch(url);
+            if(response.status === 200) {
+                const data = await response.json();
+                const temp = data.main.temp;
+                const feels_like = data.main.feels_like;
+                const humidity = data.main.humidity;
+                const desc = data.weather[0].description;
+                const country = data.sys.country;
+                const icon = data.weather[0].icon;
+
+                resultDiv.innerHTML = `
+                    <img src="https://openweathermap.org/img/wn/${icon}@2x.png" class="weather-icon" alt="weather icon">
+                    <p>📍 City: <strong>${city}, ${country}</strong></p>
+                    <p>🌡 Temperature: <strong>${temp}°C</strong></p>
+                    <p>🤗 Feels Like: <strong>${feels_like}°C</strong></p>
+                    <p>💧 Humidity: <strong>${humidity}%</strong></p>
+                    <p>🌦 Weather: <strong>${desc.charAt(0).toUpperCase() + desc.slice(1)}</strong></p>
+                `;
+            } else {
+                resultDiv.innerHTML = "<p style='color:red;'>City not found or API error!</p>";
+            }
+        } catch (error) {
+            resultDiv.innerHTML = "<p style='color:red;'>Error fetching weather data.</p>";
+        }
+    }
+</script>
+
+</body>
+</html>
